@@ -1,5 +1,7 @@
 'use client';
 
+import Image from 'next/image';
+import hanaloopLogo from '@/assets/images/hanaloop_logo.jpg';
 import { EmissionSummaryCard, EmissionStackedChart, useEmissionSummary } from '@/features/emission-chart';
 import { ACTIVITY_TYPE_COLORS } from '@/shared/config/emission-factors';
 import type { ActivityType } from '@/entities/emission';
@@ -24,6 +26,20 @@ export const EmissionDashboard = () => {
         <h1 className="text-2xl font-bold text-gray-900">탄소 배출량 대시보드</h1>
         <p className="mt-1 text-sm text-gray-400">CT-045 · 컴퓨터 화면 · 2025년 1월 ~ 8월</p>
       </div>
+
+      {/* 브랜드 이미지 */}
+      <section className="w-full rounded-2xl overflow-hidden bg-white shadow-sm border border-gray-100">
+        <Image
+          src={hanaloopLogo}
+          alt="Hanaloop 로고"
+          width={0}
+          height={0}
+          sizes="100vw"
+          className="w-full h-auto"
+          priority
+          unoptimized
+        />
+      </section>
 
       {/* 요약 카드 */}
       <section className="grid grid-cols-2 gap-4 lg:grid-cols-4">
