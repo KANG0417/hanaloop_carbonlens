@@ -35,11 +35,10 @@ const Picker = ({ tag, items, selected, onSelect }: PickerProps) => {
   return (
     <div ref={ref} className="relative">
       <button
-        onClick={() => setOpen((v) => !v)}
+        onClick={() => setOpen((v: boolean) => !v)}
         className="flex items-center gap-2 bg-gray-50 border border-gray-100 rounded-2xl px-4 py-2.5 hover:bg-gray-100 transition-colors"
       >
-        <span className="text-xs font-bold text-gray-400 uppercase tracking-wider shrink-0">{tag}</span>
-        <span className="text-sm font-extrabold text-gray-700 max-w-[120px] truncate">{current.label}</span>
+        <span className="text-sm font-extrabold text-gray-700 max-w-[140px] truncate">{current.label}</span>
         <ChevronDown className={cn('w-3.5 h-3.5 text-gray-400 transition-transform duration-300', open && 'rotate-180')} />
       </button>
 

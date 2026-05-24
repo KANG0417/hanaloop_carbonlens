@@ -22,8 +22,8 @@ export const activityFormSchema = z.object({
   amount: z
     .number({ error: '숫자를 입력하세요' })
     .positive('0보다 큰 값이어야 합니다'),
-  unit: z.enum(['kWh', 'MWh', 'g', 'kg', 't', 'ton-km'], {
-    error: 'kWh · MWh · g · kg · t · ton-km 중 하나여야 합니다',
+  unit: z.enum(['kWh', 'MWh', 'mg', 'g', 'kg', 't', 'ton-km', 'km'], {
+    error: '올바른 단위를 선택하세요',
   }),
 });
 
@@ -49,8 +49,8 @@ export const activityRowSchema = z.object({
   amount: z.coerce
     .number({ error: '숫자를 입력하세요' })
     .positive('0보다 큰 값이어야 합니다'),
-  unit: z.enum(['kWh', 'MWh', 'g', 'kg', 't', 'ton-km'], {
-    error: 'kWh · MWh · g · kg · t · ton-km 중 하나여야 합니다',
+  unit: z.enum(['kWh', 'MWh', 'mg', 'g', 'kg', 't', 'ton-km', 'km'], {
+    error: '올바른 단위를 선택하세요',
   }),
 });
 

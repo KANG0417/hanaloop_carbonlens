@@ -8,16 +8,18 @@ import { activityFormSchema, type ActivityFormValues, type ActivityRow } from '@
 import {
   ACTIVITY_TYPES,
   UNITS_BY_TYPE,
+  UNIT_LABELS,
   DESCRIPTIONS_BY_TYPE,
   EMISSION_FACTORS,
   UNIT_MULTIPLIERS,
 } from '@/entities/activity';
-import { Label }       from '@/shared/ui/label';
-import { Button }      from '@/shared/ui/button';
-import { SelectField } from '@/shared/ui/select-field';
-import { Badge }       from '@/shared/ui/badge';
-import { DatePicker }  from '@/shared/ui/date-picker';
-import { Input }       from '@/shared/ui/input';
+import type { Unit } from '@/entities/activity';
+import { Label }        from '@/shared/ui/label';
+import { Button }       from '@/shared/ui/button';
+import { CustomSelect } from '@/shared/ui/custom-select';
+import { Badge }        from '@/shared/ui/badge';
+import { DatePicker }   from '@/shared/ui/date-picker';
+import { Input }        from '@/shared/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/shared/ui/table';
 
 function calcCo2e(description: string, amount: number, unit: string) {
@@ -54,6 +56,8 @@ export const ManualEntryTab = () => {
   const descriptions = DESCRIPTIONS_BY_TYPE[activityType] ?? [];
   const units        = UNITS_BY_TYPE[activityType] ?? [];
 
+  const unitOptions = units.map((u) => ({ value: u, label: UNIT_LABELS[u as Unit] ?? u }));
+
   function onAdd(data: ActivityFormValues) {
     setRows((prev) => [...prev, data]);
     setSaved(false);
@@ -73,7 +77,6 @@ export const ManualEntryTab = () => {
 
   function handleSave() {
     setSaved(true);
-    // TODO: POST /api/activities
   }
 
   return (
@@ -85,18 +88,14 @@ export const ManualEntryTab = () => {
 
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-5">
 
-          {/* 일자 — 커스텀 캘린더 */}
+          {/* 일자 */}
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="date">일자</Label>
+            <Label>일자</Label>
             <Controller
               name="date"
               control={control}
               render={({ field }) => (
-                <DatePicker
-                  value={field.value}
-                  onChange={field.onChange}
-                  hasError={!!errors.date}
-                />
+                <DatePicker value={field.value} onChange={field.onChange} hasError={!!errors.date} />
               )}
             />
             {errors.date && <p className="text-xs text-red-500">{errors.date.message}</p>}
@@ -104,43 +103,47 @@ export const ManualEntryTab = () => {
 
           {/* 활동 유형 */}
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="activityType">활동 유형</Label>
-            <SelectField
-              id="activityType"
-              {...register('activityType', {
-                onChange: (e) => {
-                  const type = e.target.value as typeof ACTIVITY_TYPES[number];
-                  setValue('description', DESCRIPTIONS_BY_TYPE[type][0] ?? '');
-                  setValue('unit', UNITS_BY_TYPE[type][0] ?? 'kWh');
-                },
-              })}
-            >
-              {ACTIVITY_TYPES.map((t) => (
-                <option key={t} value={t}>{t}</option>
-              ))}
-            </SelectField>
+            <Label>활동 유형</Label>
+            <Controller
+              name="activityType"
+              control={control}
+              render={({ field }) => (
+                <CustomSelect
+                  value={field.value}
+                  onChange={(val) => {
+                    field.onChange(val);
+                    const type = val as typeof ACTIVITY_TYPES[number];
+                    setValue('description', DESCRIPTIONS_BY_TYPE[type][0] ?? '');
+                    setValue('unit', UNITS_BY_TYPE[type][0] ?? 'kWh');
+                  }}
+                  options={ACTIVITY_TYPES.map((t) => ({ value: t, label: t }))}
+                />
+              )}
+            />
           </div>
 
           {/* 설명 */}
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="description">설명</Label>
-            <SelectField
-              id="description"
-              {...register('description')}
-              className={errors.description ? 'ring-2 ring-red-400' : ''}
-            >
-              {descriptions.map((d) => (
-                <option key={d} value={d}>{d}</option>
-              ))}
-            </SelectField>
+            <Label>설명</Label>
+            <Controller
+              name="description"
+              control={control}
+              render={({ field }) => (
+                <CustomSelect
+                  value={field.value}
+                  onChange={field.onChange}
+                  options={descriptions}
+                  hasError={!!errors.description}
+                />
+              )}
+            />
             {errors.description && <p className="text-xs text-red-500">{errors.description.message}</p>}
           </div>
 
           {/* 량 */}
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="amount">량</Label>
+            <Label>량</Label>
             <Input
-              id="amount"
               type="number"
               step="any"
               min="0"
@@ -153,12 +156,18 @@ export const ManualEntryTab = () => {
 
           {/* 단위 */}
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="unit">단위</Label>
-            <SelectField id="unit" {...register('unit')}>
-              {units.map((u) => (
-                <option key={u} value={u}>{u}</option>
-              ))}
-            </SelectField>
+            <Label>단위</Label>
+            <Controller
+              name="unit"
+              control={control}
+              render={({ field }) => (
+                <CustomSelect
+                  value={field.value}
+                  onChange={field.onChange}
+                  options={unitOptions}
+                />
+              )}
+            />
           </div>
         </div>
 
@@ -217,10 +226,7 @@ export const ManualEntryTab = () => {
                         {co2e ? `${co2e.value} ${co2e.unit}` : '—'}
                       </TableCell>
                       <TableCell>
-                        <button
-                          onClick={() => removeRow(idx)}
-                          className="text-gray-300 hover:text-red-400 transition-colors"
-                        >
+                        <button onClick={() => removeRow(idx)} className="text-gray-300 hover:text-red-400 transition-colors">
                           <Trash2 className="w-4 h-4" />
                         </button>
                       </TableCell>
